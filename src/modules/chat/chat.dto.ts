@@ -1,0 +1,8 @@
+import { z } from 'zod';
+
+export const SendMessageDto = z.object({
+  conversation_id: z.string().uuid().optional(),
+  message: z.string().min(1, 'Message cannot be empty').max(2000),
+});
+
+export type SendMessageDtoType = z.infer<typeof SendMessageDto>;
