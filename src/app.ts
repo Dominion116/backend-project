@@ -10,6 +10,10 @@ import { errorMiddleware } from './middlewares/error.middleware';
 import authRoutes from './modules/auth/auth.routes';
 import chatRoutes from './modules/chat/chat.routes';
 import historyRoutes from './modules/history/history.routes';
+import profileRoutes from './modules/profile/profile.routes';
+import adminRoutes from './modules/admin/admin.routes';
+import evaluationRoutes from './modules/evaluation/evaluation.routes';
+import educationRoutes from './modules/education/education.routes';
 
 const app = express();
 
@@ -23,6 +27,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/history', historyRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/evaluation', evaluationRoutes);
+app.use('/api/education', educationRoutes);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
