@@ -16,8 +16,9 @@ export async function register(dto: RegisterDtoType) {
     user_id: data.user.id,
     full_name: dto.full_name ?? null,
     role: dto.role,
-    language: dto.language,
-    pregnancy_stage: dto.pregnancy_stage ?? null,
+    phone_number: dto.phone_number ?? null,
+    // language defaults to 'en', pregnancy_stage defaults to null.
+    // Both are updated during the onboarding flow via PATCH /api/profile.
   });
 
   if (profileError) throw new Error(`Profile creation failed: ${profileError.message}`);
