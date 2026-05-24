@@ -5,4 +5,9 @@ export const SendMessageDto = z.object({
   message: z.string().min(1, 'Message cannot be empty').max(2000),
 });
 
+export const CreateSessionDto = z.object({
+  title: z.string().max(120).optional(),
+});
+
 export type SendMessageDtoType = z.infer<typeof SendMessageDto>;
+export type CreateSessionDtoType = z.infer<typeof CreateSessionDto>;

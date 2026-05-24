@@ -1,9 +1,10 @@
--- Conversations (groups messages by session)
+-- Conversations (one per chat session)
 CREATE TABLE conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   title TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- Messages (individual chat turns)
@@ -15,8 +16,22 @@ CREATE TABLE messages (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- Keep conversations.updated_at current whenever a message is inserted
+CREATE OR REPLACE FUNCTION touch_conversation_updated_at()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+  UPDATE conversations SET updated_at = now() WHERE id = NEW.conversation_id;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_touch_conversation
+AFTER INSERT ON messages
+FOR EACH ROW EXECUTE FUNCTION touch_conversation_updated_at();
+
 -- Indexes
 CREATE INDEX idx_conversations_user_id ON conversations(user_id);
+CREATE INDEX idx_conversations_updated_at ON conversations(updated_at DESC);
 CREATE INDEX idx_messages_conversation_id ON messages(conversation_id);
 
 -- Row Level Security

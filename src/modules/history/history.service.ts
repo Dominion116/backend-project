@@ -1,22 +1,27 @@
 import { supabaseAdmin } from '../../config/supabase';
-import { Conversation, Message } from '../../types';
+import { SessionSummary, Message } from '../../types';
 
 export async function getConversations(
   userId: string,
   page: number,
   limit: number,
-): Promise<Conversation[]> {
+): Promise<SessionSummary[]> {
   const from = (page - 1) * limit;
 
   const { data, error } = await supabaseAdmin
     .from('conversations')
-    .select('*')
+    .select('*, messages(count)')
     .eq('user_id', userId)
-    .order('created_at', { ascending: false })
+    .order('updated_at', { ascending: false })
     .range(from, from + limit - 1);
 
   if (error) throw new Error(error.message);
-  return data ?? [];
+
+  return (data ?? []).map((row: any) => ({
+    ...row,
+    message_count: row.messages?.[0]?.count ?? 0,
+    messages: undefined,
+  }));
 }
 
 export async function getMessages(

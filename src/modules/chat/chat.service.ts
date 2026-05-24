@@ -4,6 +4,17 @@ import { Message, Conversation } from '../../types';
 
 const CONTEXT_WINDOW = 10;
 
+export async function createSession(userId: string, title?: string): Promise<Conversation> {
+  const { data, error } = await supabaseAdmin
+    .from('conversations')
+    .insert({ user_id: userId, title: title ?? null })
+    .select()
+    .single();
+
+  if (error || !data) throw new Error('Failed to create session');
+  return data;
+}
+
 export async function sendMessage(
   userId: string,
   message: string,

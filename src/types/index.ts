@@ -29,6 +29,11 @@ export interface Conversation {
   user_id: string;
   title: string | null;
   created_at: string;
+  updated_at: string;
+}
+
+export interface SessionSummary extends Conversation {
+  message_count: number;
 }
 
 export interface ModelPredictRequest {
