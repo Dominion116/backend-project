@@ -11,6 +11,7 @@ const envSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   DL_MODEL_URL: z.string().url().default('http://localhost:8000'),
   JWT_SECRET: z.string().min(1),
+  FRONTEND_URL: z.string().url().default('http://localhost:3001'),
 });
 
 const parsed = envSchema.safeParse(process.env);

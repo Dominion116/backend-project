@@ -1,6 +1,7 @@
 import { supabase } from '../../config/supabase';
 import { supabaseAdmin } from '../../config/supabase';
-import { RegisterDtoType, LoginDtoType } from './auth.dto';
+import { env } from '../../config/env';
+import { RegisterDtoType, LoginDtoType, ForgotPasswordDtoType, ResetPasswordDtoType } from './auth.dto';
 
 export async function register(dto: RegisterDtoType) {
   const { data, error } = await supabase.auth.signUp({
@@ -34,4 +35,25 @@ export async function login(dto: LoginDtoType) {
 
   if (error) throw new Error(error.message);
   return data;
+}
+
+export async function forgotPassword(dto: ForgotPasswordDtoType) {
+  const { error } = await supabase.auth.resetPasswordForEmail(dto.email, {
+    redirectTo: `${env.FRONTEND_URL}/auth/reset-password`,
+  });
+
+  // Always return success to avoid leaking whether an email is registered
+  if (error) console.error('[forgotPassword]', error.message);
+}
+
+export async function resetPassword(dto: ResetPasswordDtoType) {
+  // Validate the recovery token and get the user it belongs to
+  const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(dto.access_token);
+  if (userError || !userData.user) throw new Error('Invalid or expired reset token');
+
+  const { error } = await supabaseAdmin.auth.admin.updateUserById(userData.user.id, {
+    password: dto.new_password,
+  });
+
+  if (error) throw new Error(error.message);
 }

@@ -16,5 +16,16 @@ export const LoginDto = z.object({
   password: z.string().min(1),
 });
 
+export const ForgotPasswordDto = z.object({
+  email: z.string().email(),
+});
+
+export const ResetPasswordDto = z.object({
+  access_token: z.string().min(1),
+  new_password: z.string().min(8, 'Password must be at least 8 characters'),
+});
+
 export type RegisterDtoType = z.infer<typeof RegisterDto>;
 export type LoginDtoType = z.infer<typeof LoginDto>;
+export type ForgotPasswordDtoType = z.infer<typeof ForgotPasswordDto>;
+export type ResetPasswordDtoType = z.infer<typeof ResetPasswordDto>;
