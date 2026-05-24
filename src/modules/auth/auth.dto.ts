@@ -25,7 +25,20 @@ export const ResetPasswordDto = z.object({
   new_password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
+export const VerifyOtpDto = z.object({
+  email: z.string().email(),
+  token: z.string().min(6).max(6, 'OTP must be 6 digits'),
+  type: z.enum(['signup', 'recovery', 'email']).default('signup'),
+});
+
+export const ResendOtpDto = z.object({
+  email: z.string().email(),
+  type: z.enum(['signup', 'email_change']).default('signup'),
+});
+
 export type RegisterDtoType = z.infer<typeof RegisterDto>;
 export type LoginDtoType = z.infer<typeof LoginDto>;
 export type ForgotPasswordDtoType = z.infer<typeof ForgotPasswordDto>;
 export type ResetPasswordDtoType = z.infer<typeof ResetPasswordDto>;
+export type VerifyOtpDtoType = z.infer<typeof VerifyOtpDto>;
+export type ResendOtpDtoType = z.infer<typeof ResendOtpDto>;

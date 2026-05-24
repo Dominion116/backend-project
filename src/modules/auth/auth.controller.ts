@@ -42,3 +42,22 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
     return next(err);
   }
 }
+
+export async function verifyOtp(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await authService.verifyOtp(req.body);
+    return sendSuccess(res, data, 'Email verified successfully');
+  } catch (err) {
+    if (err instanceof Error) return sendError(res, err.message, 401);
+    return next(err);
+  }
+}
+
+export async function resendOtp(req: Request, res: Response, next: NextFunction) {
+  try {
+    await authService.resendOtp(req.body);
+    return sendSuccess(res, null, 'If that email is registered and unconfirmed, a new code has been sent');
+  } catch (err) {
+    return next(err);
+  }
+}

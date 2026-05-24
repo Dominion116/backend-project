@@ -1,7 +1,14 @@
 import { supabase } from '../../config/supabase';
 import { supabaseAdmin } from '../../config/supabase';
 import { env } from '../../config/env';
-import { RegisterDtoType, LoginDtoType, ForgotPasswordDtoType, ResetPasswordDtoType } from './auth.dto';
+import {
+  RegisterDtoType,
+  LoginDtoType,
+  ForgotPasswordDtoType,
+  ResetPasswordDtoType,
+  VerifyOtpDtoType,
+  ResendOtpDtoType,
+} from './auth.dto';
 
 export async function register(dto: RegisterDtoType) {
   const { data, error } = await supabase.auth.signUp({
@@ -56,4 +63,26 @@ export async function resetPassword(dto: ResetPasswordDtoType) {
   });
 
   if (error) throw new Error(error.message);
+}
+
+export async function verifyOtp(dto: VerifyOtpDtoType) {
+  const { data, error } = await supabase.auth.verifyOtp({
+    email: dto.email,
+    token: dto.token,
+    type: dto.type,
+  });
+
+  if (error) throw new Error(error.message);
+  if (!data.session) throw new Error('Verification failed — no session returned');
+  return data;
+}
+
+export async function resendOtp(dto: ResendOtpDtoType) {
+  const { error } = await supabase.auth.resend({
+    type: dto.type,
+    email: dto.email,
+  });
+
+  // Don't reveal whether the email exists
+  if (error) console.error('[resendOtp]', error.message);
 }

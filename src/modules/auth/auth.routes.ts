@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { validate } from '../../middlewares/validate.middleware';
-import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto } from './auth.dto';
+import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto, VerifyOtpDto, ResendOtpDto } from './auth.dto';
 import * as authController from './auth.controller';
 
 const router = Router();
@@ -162,5 +162,82 @@ router.post('/forgot-password', validate(ForgotPasswordDto), authController.forg
  *         description: Validation error (e.g. password too short)
  */
 router.post('/reset-password', validate(ResetPasswordDto), authController.resetPassword);
+
+/**
+ * @openapi
+ * /auth/verify-otp:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Verify the OTP sent to the user's email after registration
+ *     description: |
+ *       Called from the `/auth/verify-email` screen after the user enters their 6-digit code.
+ *       On success returns a full session (access_token + refresh_token) so the user is
+ *       immediately logged in after verification.
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, token]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: adaeze@example.com
+ *               token:
+ *                 type: string
+ *                 minLength: 6
+ *                 maxLength: 6
+ *                 example: "483920"
+ *                 description: 6-digit OTP from the confirmation email
+ *               type:
+ *                 type: string
+ *                 enum: [signup, recovery, email]
+ *                 default: signup
+ *     responses:
+ *       200:
+ *         description: Verified — returns session with access_token
+ *       401:
+ *         description: Invalid or expired OTP
+ *       422:
+ *         description: Validation error
+ */
+router.post('/verify-otp', validate(VerifyOtpDto), authController.verifyOtp);
+
+/**
+ * @openapi
+ * /auth/resend-otp:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Resend the email verification OTP
+ *     description: |
+ *       Called when the user clicks "Resend code" on the `/auth/verify-email` screen.
+ *       Always returns 200 to avoid leaking whether the email is registered.
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: adaeze@example.com
+ *               type:
+ *                 type: string
+ *                 enum: [signup, email]
+ *                 default: signup
+ *     responses:
+ *       200:
+ *         description: Code resent (or silently ignored if email not found / already confirmed)
+ *       422:
+ *         description: Validation error
+ */
+router.post('/resend-otp', validate(ResendOtpDto), authController.resendOtp);
 
 export default router;
