@@ -24,6 +24,8 @@ export async function register(dto: RegisterDtoType) {
 
   if (error) throw new Error(error.message);
 
+  console.log('[register] data.user:', data.user?.id ?? null, '| phone_number received:', dto.phone_number ?? null);
+
   // When "Confirm email" is ON, Supabase returns { user: null, session: null }
   // until the user verifies. Profile is created in verifyOtp once we have the user ID.
   // When "Confirm email" is OFF, user is returned immediately and we create the profile now.
@@ -88,6 +90,7 @@ export async function verifyOtp(dto: VerifyOtpDtoType) {
       role?: string;
       phone_number?: string;
     };
+    console.log('[verifyOtp] user_metadata:', JSON.stringify(meta));
     const { error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .upsert(
