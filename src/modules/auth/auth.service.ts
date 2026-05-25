@@ -1,5 +1,4 @@
 import { supabase, supabaseAdmin } from '../../config/supabase';
-import { env } from '../../config/env';
 import {
   RegisterDtoType,
   LoginDtoType,
@@ -53,9 +52,7 @@ export async function login(dto: LoginDtoType) {
 }
 
 export async function forgotPassword(dto: ForgotPasswordDtoType) {
-  const { error } = await supabase.auth.resetPasswordForEmail(dto.email, {
-    redirectTo: `${env.FRONTEND_URL}/auth/reset-password`,
-  });
+  const { error } = await supabase.auth.resetPasswordForEmail(dto.email);
 
   // Always return success to avoid leaking whether an email is registered
   if (error) console.error('[forgotPassword]', error.message);

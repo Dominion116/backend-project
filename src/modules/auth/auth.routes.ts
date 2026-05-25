@@ -100,11 +100,13 @@ router.post('/login', validate(LoginDto), authController.login);
  * /auth/forgot-password:
  *   post:
  *     tags: [Auth]
- *     summary: Request a password reset email
+ *     summary: Request a password reset OTP
  *     description: |
- *       Sends a reset link to the given email address.
- *       The link redirects to `FRONTEND_URL/auth/reset-password` with an `access_token`
- *       in the URL fragment (`#access_token=xxx&type=recovery`).
+ *       Sends a 6-digit OTP to the given email address.
+ *       Step 1 of 3 in the password reset flow:
+ *       1. POST /auth/forgot-password — receive OTP by email
+ *       2. POST /auth/verify-otp { type: "recovery" } — exchange OTP for session
+ *       3. POST /auth/reset-password { access_token, new_password } — set new password
  *       Always returns 200 — the response never reveals whether the email is registered.
  *     security: []
  *     requestBody:
@@ -121,7 +123,7 @@ router.post('/login', validate(LoginDto), authController.login);
  *                 example: adaeze@example.com
  *     responses:
  *       200:
- *         description: Reset email sent (or silently ignored if email not found)
+ *         description: OTP sent (or silently ignored if email not found)
  *       422:
  *         description: Validation error
  */
@@ -132,10 +134,10 @@ router.post('/forgot-password', validate(ForgotPasswordDto), authController.forg
  * /auth/reset-password:
  *   post:
  *     tags: [Auth]
- *     summary: Set a new password using the token from the reset email
+ *     summary: Set a new password using the session from verify-otp
  *     description: |
- *       The frontend extracts `access_token` from the URL fragment after the user
- *       clicks the reset link, then POSTs it here along with the new password.
+ *       Step 3 of the password reset flow. Pass the `access_token` returned by
+ *       `POST /auth/verify-otp` (with type "recovery") along with the new password.
  *       The token is single-use and expires after 1 hour.
  *     security: []
  *     requestBody:
@@ -148,7 +150,7 @@ router.post('/forgot-password', validate(ForgotPasswordDto), authController.forg
  *             properties:
  *               access_token:
  *                 type: string
- *                 description: The token extracted from the reset link URL fragment
+ *                 description: The access_token from the verify-otp response session
  *               new_password:
  *                 type: string
  *                 minLength: 8
@@ -157,7 +159,7 @@ router.post('/forgot-password', validate(ForgotPasswordDto), authController.forg
  *       200:
  *         description: Password updated — user can now log in with the new password
  *       401:
- *         description: Invalid or expired reset token
+ *         description: Invalid or expired token
  *       422:
  *         description: Validation error (e.g. password too short)
  */
