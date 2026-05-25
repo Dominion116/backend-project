@@ -1,5 +1,4 @@
-import { supabase } from '../../config/supabase';
-import { supabaseAdmin } from '../../config/supabase';
+import { supabase, supabaseAdmin } from '../../config/supabase';
 import { env } from '../../config/env';
 import {
   RegisterDtoType,
@@ -14,22 +13,29 @@ export async function register(dto: RegisterDtoType) {
   const { data, error } = await supabase.auth.signUp({
     email: dto.email,
     password: dto.password,
-    options: { data: { full_name: dto.full_name } },
+    options: {
+      data: {
+        full_name: dto.full_name ?? null,
+        role: dto.role,
+        phone_number: dto.phone_number ?? null,
+      },
+    },
   });
 
   if (error) throw new Error(error.message);
-  if (!data.user) throw new Error('Registration failed');
 
-  const { error: profileError } = await supabaseAdmin.from('user_profiles').insert({
-    user_id: data.user.id,
-    full_name: dto.full_name ?? null,
-    role: dto.role,
-    phone_number: dto.phone_number ?? null,
-    // language defaults to 'en', pregnancy_stage defaults to null.
-    // Both are updated during the onboarding flow via PATCH /api/profile.
-  });
-
-  if (profileError) throw new Error(`Profile creation failed: ${profileError.message}`);
+  // When "Confirm email" is ON, Supabase returns { user: null, session: null }
+  // until the user verifies. Profile is created in verifyOtp once we have the user ID.
+  // When "Confirm email" is OFF, user is returned immediately and we create the profile now.
+  if (data.user) {
+    const { error: profileError } = await supabaseAdmin.from('user_profiles').insert({
+      user_id: data.user.id,
+      full_name: dto.full_name ?? null,
+      role: dto.role,
+      phone_number: dto.phone_number ?? null,
+    });
+    if (profileError) throw new Error(`Profile creation failed: ${profileError.message}`);
+  }
 
   return data;
 }
@@ -73,7 +79,29 @@ export async function verifyOtp(dto: VerifyOtpDtoType) {
   });
 
   if (error) throw new Error(error.message);
-  if (!data.session) throw new Error('Verification failed — no session returned');
+  if (!data.session || !data.user) throw new Error('Verification failed — no session returned');
+
+  // Create profile if it doesn't exist yet (signup flow with confirm email ON)
+  if (dto.type === 'signup') {
+    const meta = data.user.user_metadata as {
+      full_name?: string;
+      role?: string;
+      phone_number?: string;
+    };
+    const { error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .upsert(
+        {
+          user_id: data.user.id,
+          full_name: meta.full_name ?? null,
+          role: meta.role ?? 'pregnant_woman',
+          phone_number: meta.phone_number ?? null,
+        },
+        { onConflict: 'user_id', ignoreDuplicates: true }
+      );
+    if (profileError) console.error('[verifyOtp] profile upsert failed:', profileError.message);
+  }
+
   return data;
 }
 
