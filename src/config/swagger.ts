@@ -1,5 +1,4 @@
 import swaggerJsdoc from 'swagger-jsdoc';
-import { env } from './env';
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -9,7 +8,7 @@ const options: swaggerJsdoc.Options = {
       version: '1.0.0',
       description: 'Maternal Health Chatbot Backend API',
     },
-    servers: [{ url: `http://localhost:${env.PORT}/api` }],
+    servers: [{ url: '/api' }],
     components: {
       securitySchemes: {
         bearerAuth: {

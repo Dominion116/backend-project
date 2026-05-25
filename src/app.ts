@@ -18,7 +18,21 @@ import onboardingRoutes from './modules/onboarding/onboarding.routes';
 
 const app = express();
 
-app.use(helmet());
+// app.use(
+//   helmet({
+//     crossOriginOpenerPolicy: false,
+//     crossOriginEmbedderPolicy: false,
+//     originAgentCluster: false,
+//     contentSecurityPolicy: {
+//       directives: {
+//         defaultSrc: ["'self'"],
+//         scriptSrc: ["'self'", "'unsafe-inline'"],
+//         styleSrc: ["'self'", "'unsafe-inline'"],
+//         imgSrc: ["'self'", 'data:', 'https:'],
+//       },
+//     },
+//   }),
+// );
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
