@@ -14,6 +14,7 @@ import profileRoutes from './modules/profile/profile.routes';
 import adminRoutes from './modules/admin/admin.routes';
 import evaluationRoutes from './modules/evaluation/evaluation.routes';
 import educationRoutes from './modules/education/education.routes';
+import onboardingRoutes from './modules/onboarding/onboarding.routes';
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/evaluation', evaluationRoutes);
 app.use('/api/education', educationRoutes);
+app.use('/api/onboarding', onboardingRoutes);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 

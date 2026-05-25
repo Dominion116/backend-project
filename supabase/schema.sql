@@ -48,9 +48,10 @@ CREATE TABLE IF NOT EXISTS user_profiles (
                    CHECK (pregnancy_stage IN (
                      'first_trimester', 'second_trimester', 'third_trimester', 'postpartum'
                    )),
-  due_date       DATE,
-  created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+  due_date             DATE,
+  onboarding_completed BOOLEAN     NOT NULL DEFAULT false,
+  created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at           TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_user_profiles_role ON user_profiles(role);
