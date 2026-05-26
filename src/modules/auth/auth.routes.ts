@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { validate } from '../../middlewares/validate.middleware';
 import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto, VerifyOtpDto, ResendOtpDto } from './auth.dto';
 import * as authController from './auth.controller';
+import { authMiddleware } from '../../middlewares/auth.middleware';
 
 const router = Router();
 
@@ -241,5 +242,24 @@ router.post('/verify-otp', validate(VerifyOtpDto), authController.verifyOtp);
  *         description: Validation error
  */
 router.post('/resend-otp', validate(ResendOtpDto), authController.resendOtp);
+
+/**
+ * @openapi
+ * /auth/logout:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Log out and invalidate the current session
+ *     description: |
+ *       Invalidates the user's access token on the Supabase side.
+ *       The client should discard the token after calling this endpoint.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logged out successfully
+ *       401:
+ *         description: Missing or invalid token
+ */
+router.post('/logout', authMiddleware, authController.logout);
 
 export default router;

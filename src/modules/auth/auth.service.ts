@@ -114,3 +114,8 @@ export async function resendOtp(dto: ResendOtpDtoType) {
   // Don't reveal whether the email exists
   if (error) console.error('[resendOtp]', error.message);
 }
+
+export async function logout(accessToken: string) {
+  const { error } = await supabaseAdmin.auth.admin.signOut(accessToken);
+  if (error) throw new Error(error.message);
+}

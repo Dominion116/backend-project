@@ -42,3 +42,6 @@ export type ForgotPasswordDtoType = z.infer<typeof ForgotPasswordDto>;
 export type ResetPasswordDtoType = z.infer<typeof ResetPasswordDto>;
 export type VerifyOtpDtoType = z.infer<typeof VerifyOtpDto>;
 export type ResendOtpDtoType = z.infer<typeof ResendOtpDto>;
+export type LogoutDtoType = z.infer<typeof LogoutDto>;
+
+export const LogoutDto = z.object({});

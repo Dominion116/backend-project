@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as authService from './auth.service';
-import { sendSuccess } from '../../utils/response';
-import { sendError } from '../../utils/response';
+import { sendSuccess, sendError } from '../../utils/response';
 
 export async function register(req: Request, res: Response, next: NextFunction) {
   try {
@@ -57,6 +56,16 @@ export async function resendOtp(req: Request, res: Response, next: NextFunction)
   try {
     await authService.resendOtp(req.body);
     return sendSuccess(res, null, 'If that email is registered and unconfirmed, a new code has been sent');
+  } catch (err) {
+    return next(err);
+  }
+}
+
+export async function logout(req: Request, res: Response, next: NextFunction) {
+  try {
+    const token = req.headers.authorization!.split(' ')[1];
+    await authService.logout(token);
+    return sendSuccess(res, null, 'Logged out successfully');
   } catch (err) {
     return next(err);
   }

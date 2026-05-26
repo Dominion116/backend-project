@@ -15,24 +15,11 @@ import adminRoutes from './modules/admin/admin.routes';
 import evaluationRoutes from './modules/evaluation/evaluation.routes';
 import educationRoutes from './modules/education/education.routes';
 import onboardingRoutes from './modules/onboarding/onboarding.routes';
+import contactRoutes from './modules/contact/contact.routes';
 
 const app = express();
 
-// app.use(
-//   helmet({
-//     crossOriginOpenerPolicy: false,
-//     crossOriginEmbedderPolicy: false,
-//     originAgentCluster: false,
-//     contentSecurityPolicy: {
-//       directives: {
-//         defaultSrc: ["'self'"],
-//         scriptSrc: ["'self'", "'unsafe-inline'"],
-//         styleSrc: ["'self'", "'unsafe-inline'"],
-//         imgSrc: ["'self'", 'data:', 'https:'],
-//       },
-//     },
-//   }),
-// );
+app.use(helmet());
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
@@ -47,6 +34,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/evaluation', evaluationRoutes);
 app.use('/api/education', educationRoutes);
 app.use('/api/onboarding', onboardingRoutes);
+app.use('/api/contact', contactRoutes);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 

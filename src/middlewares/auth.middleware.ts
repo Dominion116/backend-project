@@ -1,10 +1,10 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { supabaseAdmin } from '../config/supabase';
 import { AuthenticatedRequest } from '../types';
 import { sendError } from '../utils/response';
 
 export async function authMiddleware(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) {
@@ -22,6 +22,6 @@ export async function authMiddleware(
     return sendError(res, 'Invalid or expired token', 401);
   }
 
-  req.user = { id: data.user.id, email: data.user.email! };
+  (req as AuthenticatedRequest).user = { id: data.user.id, email: data.user.email! };
   return next();
 }
